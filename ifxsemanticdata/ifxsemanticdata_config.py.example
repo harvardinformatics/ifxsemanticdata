@@ -1,0 +1,58 @@
+from django.apps import apps
+import re
+# old table name to new model name
+# only need to be listed if they:
+#   require a name change,
+#   function for the value,
+#   type other than string
+table_map = {
+  'Helium_Node': 'Node',
+  'Helium_Dewar': 'Dewar',
+  'Helium_Dewar_Reading': 'DewarReading',
+  'Helium_Node_Reading': 'NodeReading'
+}
+
+
+
+# by old table, list of new columns
+# only need to be listed if they:
+#   require a name change {old_name},
+#   value is constant {val},
+#   function for the value {func},
+#   type other than string (type}
+col_maps = {
+    'Helium_Node':{
+        'credit_code': {'old_name': 'Credit_Expense_Code'},
+        'active': {'val': 1}
+    },
+    'Helium_Dewar': {
+        'volume': {'old_name': 'Size_(liters)'},
+        'name': {'func': 'get_dewar_name'},
+    },
+    'Helium_Dewar_Reading': {
+        'dewar': {'old_name': 'Helium_Dewar', 'func': 'get_fk', 'fk_model': 'Dewar', 'fk_field': 'name', 'fk_value': 'get_dewar_name'},
+        'weight': {'old_name': 'Weight_Reading', 'func': 'times_10'},
+        'reading_date': {'type': 'datetime'}
+    },
+    'Helium_Node_Reading': {
+        'node': {'old_name': 'Helium_Node', 'func': 'get_fk', 'fk_model': 'Node', 'fk_field': 'name'},
+        'reading_date': {'old_name': 'Timestamp', 'type': 'datetime'},
+        'reading': {'type': 'int'},
+        'recovered_amount': {'type': 'int'},
+        'reading_offset': {'type': 'int'}
+    }
+}
+
+"""
+CUSTOM FUNCTION GO BELOW
+
+They receive three parameters:
+row: the entire pivoted row from minilims
+col: the name of the column whose value we will return
+info: the dict of config info from the col_maps for this table and col
+
+here is an example function:
+def get_dewar_name(row, col, info):
+    name = row[col].replace('HuHe', '')
+    return name
+"""
