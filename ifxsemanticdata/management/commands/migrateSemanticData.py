@@ -53,15 +53,24 @@ Functions for column value translation
 custom functions for any app can be added
 """
 
-def times_10(row, col, info):
+def get_func(func_name):
+    if getattr(config, func_name, None):
+        func = getattr(config, func_name)
+    elif func_name in globals():
+        func =  globals()[func_name]
+    else:
+        raise ValueError('No func named %s please define this in semantic' % func_name)
+    return func
+
+def multiply(row, col, info):
     val = re.sub('[^0-9.]+', '', row[col])
-    return int(float(val) * 10)
+    return int(float(val) * info['multiple'])
 
 def get_fk(row, col, info):
     pk = None
     model = apps.get_model(target_app, info['fk_model'])
     if 'fk_value' in info:
-        val =  globals()[info['fk_value']](row, col, info)
+        val =  get_func(info['fk_value'])(row, col, info)
     else:
         val = row[col]
     filter = {info['fk_field']: val}
@@ -93,8 +102,10 @@ class Command(BaseCommand):
         since = False
         global target_app
         target_app = options['app']
-        config = __import__('%s.%s' % (target_app, 'ifxsemanticdata_config'), globals(), locals())
-        config = config.ifxsemanticdata_config
+        config_module = __import__('%s.%s' % (target_app, 'ifxsemanticdata_config'), globals(), locals())
+        global config
+        config = config_module.ifxsemanticdata_config
+
         # set the default config maps
         self.table_map = table_map
         self.base_col_map = base_col_map
@@ -160,7 +171,7 @@ class Command(BaseCommand):
             new_val = field_map['val']
         elif 'func' in field_map:
             func_name = field_map['func']
-            new_val =  globals()[func_name](row, old_col, field_map)
+            new_val =  get_func(func_name)(row, old_col, field_map)
         else:
             new_val = row[old_col]
         if 'type' in field_map:
@@ -192,6 +203,9 @@ class Command(BaseCommand):
             if 'fk_model' in field_map:
                 name = '%s_id' % name
             old_col = self.get_old_col_name(field.name, field_map)
+            # if minilims did not have this field then nothing to insert
+            if not old_col in row:
+                continue
             new_val = self.get_new_col_val(old_col, field.name, row, field_map)
             vals[name] = new_val
         return vals
