@@ -1,6 +1,6 @@
-=====
+===============
 IfxSemanticData
-=====
+===============
 
 IfxSemanticData is a Django app with models relating to semantic data that must be imported into non semantic tables in other ifx applications.
 
@@ -22,7 +22,7 @@ Installation
 
 
 Importing semantic data into the model
----------------------------
+--------------------------------------
 
 Create a mysqldump of your semantic data and make sure to specify the columns and no create info:
 (replace semantic_database and semantic_data_table with your database and table names)::
@@ -42,6 +42,10 @@ Make sure to run makemigrations and migrate.
 
 Load data from semantic_data model into your app tables
 -------------------------------
+
+  Note: these instructions assume that your application includes a model for the data in its final
+  form, i.e. a Django model with fields that map to the @@semantic_type@@ being migrated.
+  If this is not the case, add a model to models.py, make migrations, and run migrations.
 
 First add any configuration details to
 @@app_dir@@/@@app_name@@/ifxsemanticdata_config.py.  You can find an example
