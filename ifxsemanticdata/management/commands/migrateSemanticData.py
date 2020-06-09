@@ -66,6 +66,13 @@ def multiply(row, col, info):
     val = re.sub('[^0-9.]+', '', row[col])
     return int(float(val) * info['multiple'])
 
+def to_boolean(row, col, info):
+    if row[col] == info['bool_true']:
+        val = 1
+    else:
+        val = 0
+    return val
+
 def get_fk(row, col, info):
     pk = None
     model = apps.get_model(target_app, info['fk_model'])
