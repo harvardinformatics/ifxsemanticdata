@@ -13,5 +13,7 @@ class SemanticDataAdmin(admin.ModelAdmin):
     list_display = ('name', 'thing', 'property', 'value', 'table', 'key')
     ordering = ('thing', 'name', 'property', 'value')
     search_fields = ('name', 'thing', 'property', 'value')
+    list_filter = ('thing', 'table')
+
 
 admin.site.register(SemanticData, SemanticDataAdmin)
