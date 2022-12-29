@@ -44,7 +44,7 @@ setup(
         "Topic :: Utilities",
     ],
     install_requires = [
-        'Django>2, <3',
+        'Django>3, <4',
         'ifxurls',
         'requests',
         'djangorestframework>3.8'
