@@ -45,7 +45,6 @@ setup(
     ],
     install_requires = [
         'Django>3, <4',
-        'ifxurls',
         'requests',
         'djangorestframework>3.8'
     ],
